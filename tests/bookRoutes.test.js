@@ -79,20 +79,15 @@ describe('Bookmarks endpoints ', function () {
 
   describe('POST /bookmarks', () => {
     context('given no bookmarks', () => {
-
       it('does a thing', () => {
         const testBookmarks = bookmarks();
         const newBookmark = testBookmarks[0];
-        console.log(newBookmark);
 
         return supertest(app)
           .post('/bookmarks')
           .send(newBookmark)
           .expect(201)
-          .then(() => supertest(app)
-            .get('/bookmarks')
-            .expect([newBookmark])
-          )
+          .then(() => supertest(app).get('/bookmarks').expect([newBookmark]));
       });
     });
   });
@@ -107,15 +102,12 @@ describe('Bookmarks endpoints ', function () {
       it('deletes book by ID', () => {
         const id = 2;
         const testBookmarks = bookmarks();
-        const expectedResults = testBookmarks.filter(book => book.id !== id)
+        const expectedResults = testBookmarks.filter((book) => book.id !== id);
 
         return supertest(app)
           .delete(`/bookmarks/${id}`)
           .expect(204)
-          .then(() => supertest(app)
-            .get('/bookmarks')
-            .expect(expectedResults)
-          )
+          .then(() => supertest(app).get('/bookmarks').expect(expectedResults));
       });
     });
   });

@@ -1,0 +1,29 @@
+root: true
+env:
+  browser: true
+  commonjs: true
+  es2021: true
+  node: true
+extends:
+  - airbnb-base
+  - prettier
+parserOptions:
+  ecmaVersion: 12
+  sourceType: module
+ignorePatterns:
+  - "/*"
+  - "!src/"
+  - "!db/"
+  - "db/**.csv"
+rules:
+  camelcase: 0
+  comma-dangle: 0
+  linebreak-style:
+    - "error"
+    - "unix"
+  no-plusplus: 0
+  no-return-assign: 0
+  no-param-reassign: 0
+  no-trailing-spaces: 0
+  no-underscore-dangle: 0
+  import/no-useless-path-segments: 0

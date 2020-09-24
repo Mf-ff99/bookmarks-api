@@ -2,6 +2,7 @@ const express = require('express');
 const { v4: uuid } = require('uuid');
 const logger = require('../../src/libs/logger');
 const BookmarkServices = require('./bookServices');
+const store = require('./store');
 
 const bookmarksRouter = express.Router();
 const bodyParser = express.json();
@@ -47,7 +48,7 @@ bookmarksRouter
       rating
     };
 
-    bookmarks.push(newBookmark);
+    store.push(newBookmark);
 
     // res.send('it worked!!!!!!')
     return res
@@ -61,7 +62,7 @@ bookmarksRouter
   .route('/bookmarks/:id')
   .get((req, res) => {
     const { id } = req.params;
-    const bookmark = bookmarks.find((b) => b.id === id);
+    const bookmark = store.find((b) => b.id === id);
 
     if (!bookmark) {
       logger.error(`Bookmark with id ${id} not found`);
@@ -73,14 +74,14 @@ bookmarksRouter
   .delete((req, res) => {
     const { id } = req.params;
 
-    const bookmarkIndex = bookmarks.findIndex((b) => b.id === id);
+    const bookmarkIndex = store.findIndex((b) => b.id === id);
 
     if (bookmarkIndex === -1) {
       logger.error(`Bookmark with id ${id} not found.`);
       return res.status(404).send('Bookmark not found');
     }
 
-    bookmarks.splice(bookmarkIndex, 1);
+    store.splice(bookmarkIndex, 1);
 
     logger.info(`Bookmark with id ${id} deleted.`);
 

@@ -1,20 +1,41 @@
 const express = require('express');
+const xss = require('xss');
 const logger = require('../../src/libs/logger');
 const BookServices = require('./bookServices');
 
 const bookmarksRouter = express.Router();
 
-bookmarksRouter.route('/').get((req, res, next) => {
-  BookServices.getAllBookmarks(req.app.get('db'))
-    .then((bookmarks) => {
-      res.json(bookmarks);
-    })
-    .catch(next);
-});
+const regEx = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%.\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%\+.~#?&//=]*)/;
+
+bookmarksRouter
+  .route('/')
+  .get((req, res, next) => {
+    BookServices.getAllBookmarks(req.app.get('db'))
+      .then((bookmarks) => res.status(200).json(bookmarks))
+      .catch(next);
+  })
+
+  .post((req, res, next) => {
+    const { title, url, description, rating } = req.body;
+    const newBookmark = {
+      title,
+      url,
+      description,
+      rating
+    };
+    if (!url || !url.match(regEx)) {
+      logger.error(`Url is required`);
+      return res.status(400).send('Invalid data');
+    }
+
+    BookServices.createBookmark(req.app.get('db'), newBookmark)
+      .then((bookmark) => res.status(201).json(bookmark))
+      .catch(next);
+  });
 
 bookmarksRouter
   .route('/:id')
-  .get((req, res, next) => {
+  .all((req, res, next) => {
     BookServices.getBookmarkById(req.app.get('db'), req.params.id)
       .then((bookmark) => {
         if (!bookmark) {
@@ -30,12 +51,18 @@ bookmarksRouter
 
   .get((req, res) => {
     res.json({
-      id: res.bookmark.id,
-      title: res.bookmark.title,
-      url: res.bookmark.url,
-      description: res.bookmark.description,
-      rating: res.bookmark.rating
+      id: (res.bookmark.id),
+      title: xss(res.bookmark.title),
+      url: xss(res.bookmark.url),
+      description: xss(res.bookmark.description),
+      rating: (res.bookmark.rating)
     });
+  })
+
+  .delete((req, res, next) => {
+    BookServices.deleteBookmark(req.app.get('db'), req.params.id)
+      .then(() => res.status(204).end())
+      .catch(next);
   });
 
 // .post(bodyParser, (req, res) => {

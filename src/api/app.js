@@ -7,6 +7,7 @@ const helmet = require('helmet');
 const { NODE_ENV, CORS_ORIGIN } = require('../../src/config/envConfig');
 
 const errors = require('../../src/middlewares/errors');
+const bookRoutes = require('./bookRoutes');
 
 const morganOption = NODE_ENV === 'production' ? 'tiny' : 'dev';
 
@@ -27,6 +28,8 @@ app.get('/', (req, res) => {
 /*
 | ROUTES HERE -------------------------
 */
+
+app.use('/bookmarks', bookRoutes)
 
 /*
 |--------------------------------------

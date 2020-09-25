@@ -111,4 +111,30 @@ describe('Bookmarks endpoints ', function () {
       });
     });
   });
+
+  describe('PATCH /bookmarks', () => {
+    const testBookmarks = bookmarks();
+    beforeEach('insert bookmarks', () => {
+      return db.into('bookmarks').insert(testBookmarks);
+    });
+
+    it('updates book by ID', () => {
+      const id = 2;
+      const expectedResults = {
+        title: 'updated title',
+        url: 'http://www.update.com',
+        description: 'updated description',
+        rating: '1'
+      };
+
+      return supertest(app)
+        .patch(`/bookmarks/${id}`)
+        .send(expectedResults)
+        .expect(204)
+        .then(() => {
+          expectedResults.id = 2;
+          return supertest(app).get(`/bookmarks/${id}`).expect(expectedResults);
+        });
+    });
+  });
 });

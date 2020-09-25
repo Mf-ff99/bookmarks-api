@@ -51,16 +51,25 @@ bookmarksRouter
 
   .get((req, res) => {
     res.json({
-      id: (res.bookmark.id),
+      id: res.bookmark.id,
       title: xss(res.bookmark.title),
       url: xss(res.bookmark.url),
       description: xss(res.bookmark.description),
-      rating: (res.bookmark.rating)
+      rating: res.bookmark.rating
     });
   })
 
   .delete((req, res, next) => {
     BookServices.deleteBookmark(req.app.get('db'), req.params.id)
+      .then(() => res.status(204).end())
+      .catch(next);
+  })
+
+  .patch((req, res, next) => {
+    const { title, url, description, rating } = req.body;
+    const newBookmark = { title, url, description, rating }
+
+    BookServices.updateBookmark(req.app.get('db'), req.params.id, newBookmark)
       .then(() => res.status(204).end())
       .catch(next);
   });
